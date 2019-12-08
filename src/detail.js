@@ -97,7 +97,7 @@ export function renderResults(save) {
             let template = single_result_template
                 .replace('[value]', result.Points)
                 .replace('[name]', `${result.Benchmark} @ ${key} ${parseInt(key) === 1 ? 'Threads' : 'Threads'}`)
-                .replace('[score-class]', result.Points > referencePoints ? 'above' : 'below')
+                .replace('[score-class]', result.Points >= referencePoints ? 'above' : 'below')
                 .replace('[reference]', use_average_measures ? 'average' : 'reference 3900x')
                 .replace('[reference-points]', referencePoints);
 
@@ -184,8 +184,7 @@ export function render() {
     $('#sorting').hide();
     $('#prev').parent().hide();
 
-    const parts = window.location.href.split('/');
-    const id = parts[parts.length - 1];
+    const id = window.location.search.replace("?detail=", "");
 
     fetch(getSingleSaveUrl(id)).then(result => {
         if (!result.ok || result.status === 404) {

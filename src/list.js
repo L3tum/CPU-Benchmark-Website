@@ -33,7 +33,7 @@ function renderCpuList(cpus) {
                     .replace(/\[number]/g, index.toString())
                     .replace(/\[cpu]/g, save.MachineInformation.Cpu.Name)
                     .replace(/\[vendor]/g, save.MachineInformation.Cpu.Vendor)
-                    .replace(/\[filename]/g, 'detail/' + item);
+                    .replace(/\[filename]/g, '?detail=' + item);
 
                 let keys = Object.keys(save.Results);
                 let total_ac = 0;

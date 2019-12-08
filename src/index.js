@@ -4,7 +4,7 @@ import 'bootstrap';
 import './index.scss';
 
 $(function () {
-    if (window.location.href.includes("/detail/")) {
+    if (window.location.search.startsWith("?detail=")) {
         import('./detail').then(res => {
            res.render();
         });
