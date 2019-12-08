@@ -21,7 +21,7 @@
   "homepage": "https://github.com/L3tum/CPU-Benchmark-Website#readme",
   "devDependencies": {
     "autoprefixer": "^9.7.3",
-    "css-loader": "^3.2.0",
+    "css-loader": "^3.2.1",
     "node-sass": "^4.13.0",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
