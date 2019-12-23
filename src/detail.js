@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import {getSingleSaveUrl} from "./common/github";
+import {wiki_links} from "./common/wiki_links_feature_flags";
 
 const template = `
 <div class="col-12 d-flex justify-content-end"><h5>[save]</h5></div>
@@ -61,8 +62,6 @@ export function getReferencePoints(threads, benchmark) {
     if (!use_average_measures) {
         return points;
     }
-
-    console.log(average);
 
     if (!Object.keys(average.Results).includes(threads)) {
         return points;
@@ -139,6 +138,39 @@ export function renderResults(save) {
     return results.join('');
 }
 
+function renderFeatureFlags(save) {
+    let feature_flags;
+
+    feature_flags += single_info_template.replace('[name]', "Feature Flags")
+        .replace('[value]', `${save.MachineInformation.Cpu.FeatureFlagsOne},
+        ${save.MachineInformation.Cpu.FeatureFlagsTwo},`);
+
+    feature_flags += single_info_template.replace('[name]', "Extended Feature Flags")
+        .replace('[value]', `${save.MachineInformation.Cpu.ExtendedFeatureFlagsF7One},
+        ${save.MachineInformation.Cpu.ExtendedFeatureFlagsF7Two},
+        ${save.MachineInformation.Cpu.ExtendedFeatureFlagsF7Three},`);
+
+    feature_flags += single_info_template.replace('[name]', "AMD Feature Flags")
+        .replace('[value]', `${save.MachineInformation.Cpu.AMDFeatureFlags.ExtendedFeatureFlagsF81One},
+        ${save.MachineInformation.Cpu.AMDFeatureFlags.ExtendedFeatureFlagsF81Two},
+        ${save.MachineInformation.Cpu.AMDFeatureFlags.FeatureFlagsSvm},
+        ${save.MachineInformation.Cpu.AMDFeatureFlags.FeatureFlagsApm},`);
+
+    feature_flags += single_info_template.replace('[name]', "Intel Feature Flags")
+        .replace('[value]', `${save.MachineInformation.Cpu.IntelFeatureFlags.TPMFeatureFlags}\n
+        ${save.MachineInformation.Cpu.IntelFeatureFlags.ExtendedFeatureFlagsF81One},
+        ${save.MachineInformation.Cpu.IntelFeatureFlags.ExtendedFeatureFlagsF81Two},
+        ${save.MachineInformation.Cpu.IntelFeatureFlags.FeatureFlagsApm},`);
+
+    for (let wikiLinksKey in wiki_links) {
+        feature_flags = feature_flags.replace(new RegExp(`([^a-zA-Z0-9_])${wikiLinksKey}(?![a-zA-Z0-9_]+)(,?)`, "g"), `$1<a href="${wiki_links[wikiLinksKey]}" target="_blank">${wikiLinksKey}</a>$2`);
+    }
+
+    feature_flags = feature_flags.replace(/,? ?NONE(,?)/g, '$1').replace(/,\W*,/g, ',').replace(/,\W*<\/td>/g, '');;
+
+    return feature_flags;
+}
+
 export function renderInfo(save) {
     let info = '';
 
@@ -163,7 +195,7 @@ export function renderInfo(save) {
     let caches = '';
 
     save.MachineInformation.Cpu.Caches.forEach(function (cache) {
-        caches += `L${cache.Level}\t${cache.CapacityHRF}\t${cache.Associativity}-way\t${cache.TimesPresent}-times\t${cache.Type === 1 ? 'Instruction' : cache.Type === 2 ? 'Data' : ''}\n`;
+        caches += `${cache.Level}\t${cache.CapacityHRF}\t${cache.Associativity}-way\t${cache.TimesPresent}-times\t${cache.Type === 1 ? 'Instruction' : cache.Type === 2 ? 'Data' : ''}\n`;
     });
 
     info += single_info_template.replace('[name]', 'Caches').replace('[value]', `<span style="white-space: pre">${caches}</span>`);
@@ -175,6 +207,8 @@ export function renderInfo(save) {
     });
 
     info += single_info_template.replace('[name]', 'RAM').replace('[value]', `<span style="white-space: pre">${rams}</span>`);
+
+    info += renderFeatureFlags(save);
 
     return info;
 }

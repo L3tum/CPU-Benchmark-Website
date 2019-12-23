@@ -21,17 +21,17 @@
   "homepage": "https://github.com/L3tum/CPU-Benchmark-Website#readme",
   "devDependencies": {
     "autoprefixer": "^9.7.3",
-    "css-loader": "^3.2.1",
+    "css-loader": "^3.4.0",
     "node-sass": "^4.13.0",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
     "sass-loader": "^8.0.0",
-    "style-loader": "^1.0.1",
-    "webpack": "^4.41.2",
+    "style-loader": "^1.1.1",
+    "webpack": "^4.41.4",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@octokit/rest": "^16.35.0",
+    "@octokit/rest": "^16.35.2",
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
