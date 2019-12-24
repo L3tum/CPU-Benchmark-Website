@@ -12,3 +12,15 @@ export function getSingleSaveUrl(filename) {
 export function getPageFileUrl(page) {
     return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/pagination/${page}.json`;
 }
+
+export function getAverageAggregationUrl() {
+    return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/byCPU/average.json`;
+}
+
+export function getSCAverageAggregationUrl() {
+    return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/averageByCoreCount/1.json`;
+}
+
+export function getACAverageAggregationUrl(count) {
+    return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/averageByCoreCount/${count}.json`;
+}
