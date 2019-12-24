@@ -159,17 +159,17 @@ function renderComparison(comparisons, context, label = 'Points') {
 function fetchAveragePointsAroundScore(nameToSkip, limit = 10000) {
     return new Promise((resolve, reject) => {
         fetch(getAverageAggregationUrl()).then(averagesJSON => {
-            const parsedAverages = [];
-            const promises = [];
-
             if (!averagesJSON.ok) {
                 resolve([]);
                 return;
             }
 
             averagesJSON.json().then(averages => {
+                const parsedAverages = [];
+                const promises = [];
+
                 for (const entry of averages.Entries) {
-                    if (entry.Name === nameToSkip) {
+                    if (entry.Value === nameToSkip) {
                         continue;
                     }
 
@@ -184,7 +184,7 @@ function fetchAveragePointsAroundScore(nameToSkip, limit = 10000) {
 
                                 if (averageScore <= score + limit && averageScore >= score - limit) {
                                     parsedAverages.push({
-                                        'name': entry.Name,
+                                        'name': averageSaveFile.MachineInformation.Cpu.Name,
                                         'value': averageScore,
                                         'color': vendor_colors[averageSaveFile.MachineInformation.Vendor]
                                     });
@@ -219,16 +219,20 @@ function renderPointsComparisonGraph(save) {
             }
 
             Promise.all([averagePromise, renderPromise]).then(() => {
-                fetchAveragePointsAroundScore(save.MachineInformation.Caption).then(averages => {
+                fetchAveragePointsAroundScore(save.MachineInformation.Cpu.Caption).then(averages => {
                     const comparisons = [
                         {'name': 'You', 'value': score, 'color': '#008000'},
-                        {
-                            'name': 'Average',
-                            'value': calculateOverallScore(average),
-                            'color': vendor_colors[average.MachineInformation.Cpu.Vendor]
-                        },
                         ...averages
                     ];
+
+                    if (average !== null) {
+                        comparisons.push(
+                            {
+                                'name': 'Average',
+                                'value': calculateOverallScore(average),
+                                'color': vendor_colors[average.MachineInformation.Cpu.Vendor]
+                            });
+                    }
 
                     if (comparisons.length > 1) {
                         renderComparison(comparisons, document.getElementById('score_comparison'))
@@ -421,7 +425,7 @@ export function renderInfo(save) {
     let cores = '';
 
     save.MachineInformation.Cpu.Cores.forEach(function (core) {
-        cores += `#${core.Number.toString().padStart(2, '0')} ${(save.MachineInformation.Cpu.MaxClockSpeed / 1000).toFixed(2)} GHz${(core.Number + 1) % 3 === 0 ? '\n' : '\t'}`;
+        cores += `#${core.Number.toString().padStart(2, '0')} ${(core.MaxClockSpeed / 1000).toFixed(2)} GHz${(core.Number + 1) % 3 === 0 ? '\n' : '\t'}`;
     });
 
     info += single_info_template.replace('[name]', 'Cores').replace('[value]', `<span style="white-space: pre">${cores}</span>`);
