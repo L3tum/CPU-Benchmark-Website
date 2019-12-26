@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es2019",
+    "sourceMap": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

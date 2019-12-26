@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "webpack --mode production",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "start": "webpack-dev-server --mode development"
   },
   "repository": {
     "type": "git",
@@ -20,15 +21,20 @@
   },
   "homepage": "https://github.com/L3tum/CPU-Benchmark-Website#readme",
   "devDependencies": {
+    "@types/chart.js": "^2.9.7",
     "autoprefixer": "^9.7.3",
     "css-loader": "^3.4.0",
+    "mustache-loader": "^1.4.3",
     "node-sass": "^4.13.0",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.1.1",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
     "webpack": "^4.41.4",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
     "@octokit/rest": "^16.35.2",

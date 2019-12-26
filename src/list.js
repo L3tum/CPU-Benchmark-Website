@@ -1,44 +1,83 @@
 import $ from 'jquery';
-import {getPageFileUrl} from "./common/github";
+import {getHighestFrequencyAggregationUrl, getPageFileUrl, getSingleSaveUrl} from "./common/github.ts";
+import homeTemplate from './templates/home_template.msc';
 
 const results = [];
 
 let current_page = 1;
 
-const item_template = `
-<div class="col-12">
-<div class="card">
-    <a id="heading-[number]" class="detail-button [vendor]" href="[filename]">
-        <div class="card-header d-flex justify-content-between">
-            <h5 class="mb-0">
-                [cpu]
-            </h5>
-            <h5>
-                Score [score]</span>
-            </h5>
-        </div>
-    </a>
- </div>
- </div>
-`;
+function getHighestFrequencies() {
+    return new Promise((resolve, reject) => {
+        fetch(getHighestFrequencyAggregationUrl()).then(highestFrequenciesJSON => {
+            if (!highestFrequenciesJSON.ok) {
+                resolve([]);
+
+                return;
+            }
+
+            highestFrequenciesJSON.json().then(highestFrequencies => {
+                const entries = highestFrequencies.Entries.length > 5 ? highestFrequencies.Entries.slice(0, 5) : highestFrequencies.Entries;
+                const list = [];
+                const promises = [];
+
+                for (const entry of entries) {
+                    promises.push(new Promise((resolve, reject) => {
+                        fetch(getSingleSaveUrl(entry.SaveFile)).then(saveFileJSON => {
+                            if (!saveFileJSON.ok) {
+                                resolve();
+
+                                return;
+                            }
+
+                            saveFileJSON.json().then(saveFile => {
+                                list.push({
+                                    frequency: (parseInt(entry.Value) / 1000).toFixed(2),
+                                    name: saveFile.MachineInformation.Cpu.Name,
+                                    vendor: saveFile.MachineInformation.Cpu.Vendor,
+                                    filename: '?detail=' + entry.SaveFile
+                                });
+
+                                resolve();
+                            });
+                        })
+                    }));
+                }
+
+                Promise.all(promises).then(() => {
+                    list.sort(function (a, b) {
+                        if (a.frequency > b.frequency) {
+                            return -1;
+                        }
+
+                        if (a.frequency < b.frequency) {
+                            return 1;
+                        }
+
+                        return 0;
+                    });
+
+                    resolve(list);
+                });
+            });
+        });
+    });
+}
 
 function renderCpuList(cpus) {
-    let html = '';
+    const cpuList = [];
 
-    cpus.forEach(function (item, index) {
-        console.log(item.Value);
-
+    cpus.forEach(function (item) {
         const item_parts = item.Value.split(" === ");
-        const item_html = item_template.replace(/\[number]/g, index.toString())
-            .replace(/\[cpu]/g, item_parts[0])
-            .replace(/\[vendor]/g, item_parts[1])
-            .replace(/\[score]/g, item_parts[2])
-            .replace(/\[filename]/g, '?detail=' + item.SaveFile);
 
-        html += item_html;
+        cpuList.push({
+            name: item_parts[0],
+            vendor: item_parts[1],
+            score: item_parts[2],
+            filename: '?detail=' + item.SaveFile
+        });
     });
 
-    return html;
+    return cpuList;
 }
 
 function getResultsCurrentPage(page = current_page - 1) {
@@ -77,44 +116,46 @@ function render() {
     current.html(current_page);
 
     getResultsCurrentPage().then(results => {
-        const html = renderCpuList(results);
+        const cpuList = renderCpuList(results);
 
-        $('#accordion').html(html);
-        $('.collapse').collapse();
-        current.html(current_page);
+        getHighestFrequencies().then(highestFrequencies => {
+            $('#accordion').html(homeTemplate({cpus: cpuList, highestFrequencies: highestFrequencies}));
+            $('.collapse').collapse();
+            current.html(current_page);
 
-        // Check previous page
-        getResultsCurrentPage(current_page - 2).then(results => {
-            if (results.length === 0) {
-                prev.prop('disabled', true);
-                prev.off('click');
-            } else {
-                prev.prop('disabled', false);
-                prev.on('click', () => {
-                    current_page--;
-                    render();
-                });
-            }
+            // Check previous page
+            getResultsCurrentPage(current_page - 2).then(results => {
+                if (results.length === 0) {
+                    prev.prop('disabled', true);
+                    prev.off('click');
+                } else {
+                    prev.prop('disabled', false);
+                    prev.on('click', () => {
+                        current_page--;
+                        render();
+                    });
+                }
+            });
+
+            // Check next page
+            getResultsCurrentPage(current_page).then(results => {
+                if (results.length === 0) {
+                    next.prop('disabled', true);
+                    next.off('click');
+                } else {
+                    next.prop('disabled', false);
+                    next.on('click', () => {
+                        current_page++;
+                        render();
+                    });
+                }
+            });
+
+            // // Register detail buttons
+            // $('.detail-button').on('click', function () {
+            //     window.location.href = '/detail/' + $(this).data('filename');
+            // });
         });
-
-        // Check next page
-        getResultsCurrentPage(current_page).then(results => {
-            if (results.length === 0) {
-                next.prop('disabled', true);
-                next.off('click');
-            } else {
-                next.prop('disabled', false);
-                next.on('click', () => {
-                    current_page++;
-                    render();
-                });
-            }
-        });
-
-        // // Register detail buttons
-        // $('.detail-button').on('click', function () {
-        //     window.location.href = '/detail/' + $(this).data('filename');
-        // });
     });
 }
 

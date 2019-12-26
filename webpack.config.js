@@ -7,8 +7,22 @@ module.exports = {
         filename: 'main.js',
         path: path.resolve(__dirname, 'dist'),
     },
+    devServer: {
+        contentBase: path.join(__dirname, 'dist'),
+        compress: true,
+        port: 9000
+    },
     module: {
         rules: [
+            {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
+            },
+            {
+                test: /\.msc$/,
+                loader: 'mustache-loader?minify'
+            },
             {
                 test: /\.(scss)$/,
                 use: [{
@@ -30,5 +44,8 @@ module.exports = {
                 }]
             }
         ]
-    }
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js"]
+    },
 };

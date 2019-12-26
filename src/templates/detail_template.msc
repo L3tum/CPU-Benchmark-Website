@@ -1,0 +1,95 @@
+<div class="col-12 d-flex justify-content-end">
+    <h5>{{save}}</h5>
+</div>
+<div class="col-12 d-flex justify-content-between">
+    <h2>{{name}}</h2>
+    <h2>{{score}} Points</h2>
+</div>
+<div class="col-12 col-lg-6" style="margin-top: 50px">
+    <h5>Results</h5>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Threads</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#results_all}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{value}}</td>
+            </tr>
+        {{/results_all}}
+        </tbody>
+    </table>
+    <br><br>
+    <h5>Results per Category</h5>
+    <table class="table">
+        <thead>
+        <tr data-toggle="collapse" data-target="#category_table" class="clickable">
+            <th>Category (Click to expand)</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody id="category_table" class="collapse">
+        {{#results_categories}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{value}}</td>
+            </tr>
+        {{/results_categories}}
+        </tbody>
+    </table>
+    <br><br>
+    <h5>Results Detailed</h5>
+    <table class="table">
+        <thead>
+        <tr data-toggle="collapse" data-target="#detailed_table" class="clickable">
+            <th>Benchmark (Click to expand)</th>
+            <th>Score</th>
+        </tr>
+        </thead>
+        <tbody id="detailed_table" class="collapse">
+        {{#results_detailed}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{value}}</td>
+            </tr>
+        {{/results_detailed}}
+        </tbody>
+    </table>
+</div>
+<div class="col-12 col-lg-6" style="margin-top: 50px">
+    <h5>Comparisons</h5>
+    <h6>Total Average</h6>
+    <canvas id="score_comparison" width="400" height="100%"></canvas>
+    <br><br>
+    <div id="sc_average">
+        <h6>Single Core Average</h6>
+        <canvas id="sc_comparison" width="400" height="100%"></canvas>
+    </div>
+    <div id="ac_average">
+        <h6>All Core Average</h6>
+        <canvas id="ac_comparison" width="400" height="100%"></canvas>
+    </div>
+</div>
+<div class="col-12 col-lg-6" style="margin-top: 50px">
+    <h5>Machine</h5>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#infos}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{&value}}</td>
+            </tr>
+        {{/infos}}
+        </tbody>
+    </table>
+</div>

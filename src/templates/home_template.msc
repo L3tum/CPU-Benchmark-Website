@@ -1,0 +1,42 @@
+<div class="col-12">
+    <h5>Highest Frequencies</h5>
+    {{#highestFrequencies}}
+        <div class="col-12">
+            <div class="card">
+                <a class="detail-button {{vendor}}" href="{{filename}}">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">
+                            {{name}}
+                        </h5>
+                        <h5>
+                            {{frequency}} GHz
+                        </h5>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {{/highestFrequencies}}
+</div>
+<div class="col-12">
+    <h5>Highest Scores</h5>
+</div>
+<div class="col-12">
+    <br><br>
+    <h5>Random</h5>
+    {{#cpus}}
+        <div class="col-12">
+            <div class="card">
+                <a class="detail-button {{vendor}}" href="{{filename}}">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0">
+                            {{name}}
+                        </h5>
+                        <h5>
+                            Score {{score}}
+                        </h5>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {{/cpus}}
+</div>
