@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import {getHighestFrequencyAggregationUrl, getPageFileUrl, getSingleSaveUrl} from "./common/github.ts";
 import homeTemplate from './templates/home_template.msc';
+import {getHighestOverallScoreAggregationUrl} from "./common/github";
 
 const results = [];
 
@@ -63,6 +64,48 @@ function getHighestFrequencies() {
     });
 }
 
+function getHighestScores() {
+    return new Promise((resolve, reject) => {
+        fetch(getHighestOverallScoreAggregationUrl()).then(highestScoresJSON => {
+            if (!highestScoresJSON.ok) {
+                resolve([]);
+
+                return;
+            }
+
+            highestScoresJSON.json().then(highestScores => {
+                const entries = highestScores.Entries.length > 5 ? highestScores.Entries.slice(0, 5) : highestScores.Entries;
+                const list = [];
+
+                for (const entry of entries) {
+                    const parts = entry.Value.split(' === ');
+
+                    list.push({
+                        score: parseInt(parts[2]),
+                        name: parts[0],
+                        vendor: parts[1],
+                        filename: '?detail=' + entry.SaveFile
+                    });
+                }
+
+                list.sort(function (a, b) {
+                    if (a.score > b.score) {
+                        return -1;
+                    }
+
+                    if (a.score < b.score) {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+
+                resolve(list);
+            });
+        });
+    });
+}
+
 function renderCpuList(cpus) {
     const cpuList = [];
 
@@ -119,42 +162,49 @@ function render() {
         const cpuList = renderCpuList(results);
 
         getHighestFrequencies().then(highestFrequencies => {
-            $('#accordion').html(homeTemplate({cpus: cpuList, highestFrequencies: highestFrequencies}));
-            $('.collapse').collapse();
-            current.html(current_page);
 
-            // Check previous page
-            getResultsCurrentPage(current_page - 2).then(results => {
-                if (results.length === 0) {
-                    prev.prop('disabled', true);
-                    prev.off('click');
-                } else {
-                    prev.prop('disabled', false);
-                    prev.on('click', () => {
-                        current_page--;
-                        render();
-                    });
-                }
+            getHighestScores().then(highestScores => {
+                $('#accordion').html(homeTemplate({
+                    cpus: cpuList,
+                    highestFrequencies: highestFrequencies,
+                    highestScores: highestScores
+                }));
+                $('.collapse').collapse();
+                current.html(current_page);
+
+                // Check previous page
+                getResultsCurrentPage(current_page - 2).then(results => {
+                    if (results.length === 0) {
+                        prev.prop('disabled', true);
+                        prev.off('click');
+                    } else {
+                        prev.prop('disabled', false);
+                        prev.on('click', () => {
+                            current_page--;
+                            render();
+                        });
+                    }
+                });
+
+                // Check next page
+                getResultsCurrentPage(current_page).then(results => {
+                    if (results.length === 0) {
+                        next.prop('disabled', true);
+                        next.off('click');
+                    } else {
+                        next.prop('disabled', false);
+                        next.on('click', () => {
+                            current_page++;
+                            render();
+                        });
+                    }
+                });
+
+                // // Register detail buttons
+                // $('.detail-button').on('click', function () {
+                //     window.location.href = '/detail/' + $(this).data('filename');
+                // });
             });
-
-            // Check next page
-            getResultsCurrentPage(current_page).then(results => {
-                if (results.length === 0) {
-                    next.prop('disabled', true);
-                    next.off('click');
-                } else {
-                    next.prop('disabled', false);
-                    next.on('click', () => {
-                        current_page++;
-                        render();
-                    });
-                }
-            });
-
-            // // Register detail buttons
-            // $('.detail-button').on('click', function () {
-            //     window.location.href = '/detail/' + $(this).data('filename');
-            // });
         });
     });
 }

@@ -28,3 +28,7 @@ export function getACAverageAggregationUrl(count: number): string {
 export function getHighestFrequencyAggregationUrl(): string {
     return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/byHighestFrequency/single-core.json`;
 }
+
+export function getHighestOverallScoreAggregationUrl(): string {
+    return `${BASE_URL}${OWNER}/${REPO}/${BRANCH}/${AGGREGATIONS_PATH}/byHighestScore/overall-score.json`;
+}

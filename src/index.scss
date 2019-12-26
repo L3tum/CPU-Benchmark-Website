@@ -10,8 +10,26 @@ html, body {
   //}
 }
 
+.container {
+  max-width: 75% !important;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .container {
+    max-width: 100% !important;;
+  }
+
+  .cpu-entry {
+    font-size: 12px;
+  }
+}
+
 .row {
   width: 100%;
+  margin-right: 0;
+  margin-left: 0;
 }
 
 .navbar-background {
@@ -72,4 +90,10 @@ html, body {
 .category-all {
   background-color: darkred;
   color: white;
+}
+
+h5 {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }

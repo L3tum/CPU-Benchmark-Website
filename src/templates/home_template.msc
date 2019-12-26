@@ -1,14 +1,14 @@
-<div class="col-12">
+<div class="col-xl-6 col-12 pt-5">
     <h5>Highest Frequencies</h5>
     {{#highestFrequencies}}
         <div class="col-12">
             <div class="card">
                 <a class="detail-button {{vendor}}" href="{{filename}}">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="mb-0">
+                        <h5 class="mb-0 cpu-entry">
                             {{name}}
                         </h5>
-                        <h5>
+                        <h5 class="cpu-entry">
                             {{frequency}} GHz
                         </h5>
                     </div>
@@ -17,22 +17,37 @@
         </div>
     {{/highestFrequencies}}
 </div>
-<div class="col-12">
+<div class="col-xl-6 col-12 pt-5">
     <h5>Highest Scores</h5>
+    {{#highestScores}}
+        <div class="col-12">
+            <div class="card">
+                <a class="detail-button {{vendor}}" href="{{filename}}">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="mb-0 cpu-entry">
+                            {{name}}
+                        </h5>
+                        <h5 class="cpu-entry">
+                            {{score}} Points
+                        </h5>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {{/highestScores}}
 </div>
-<div class="col-12">
-    <br><br>
+<div class="col-xl-6 col-12 pt-5">
     <h5>Random</h5>
     {{#cpus}}
         <div class="col-12">
             <div class="card">
                 <a class="detail-button {{vendor}}" href="{{filename}}">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="mb-0">
+                        <h5 class="mb-0 cpu-entry">
                             {{name}}
                         </h5>
-                        <h5>
-                            Score {{score}}
+                        <h5 class="cpu-entry">
+                            {{score}} Points
                         </h5>
                     </div>
                 </a>
