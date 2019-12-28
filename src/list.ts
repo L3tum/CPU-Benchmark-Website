@@ -1,13 +1,12 @@
 import $ from 'jquery';
-import {getHighestFrequencyAggregationUrl, getPageFileUrl, getSingleSaveUrl} from "./common/github.ts";
+import {getHighestFrequencyAggregationUrl, getHighestOverallScoreAggregationUrl, getPageFileUrl} from "./common/github";
 import homeTemplate from './templates/home_template.msc';
-import {getHighestOverallScoreAggregationUrl} from "./common/github";
 
-const results = [];
+const results: Array<any> = [];
 
-let current_page = 1;
+let current_page: number = 1;
 
-function getHighestFrequencies() {
+function getHighestFrequencies(): Promise<Array<{ frequency: number, name: string, vendor: string, filename: string }>> {
     return new Promise((resolve, reject) => {
         fetch(getHighestFrequencyAggregationUrl()).then(highestFrequenciesJSON => {
             if (!highestFrequenciesJSON.ok) {
@@ -17,56 +16,41 @@ function getHighestFrequencies() {
             }
 
             highestFrequenciesJSON.json().then(highestFrequencies => {
-                const entries = highestFrequencies.Entries.length > 5 ? highestFrequencies.Entries.slice(0, 5) : highestFrequencies.Entries;
+                const entries: Array<{ Value: string, SaveFile: string }> = highestFrequencies.Entries.length > 5 ? highestFrequencies.Entries.slice(0, 5) : highestFrequencies.Entries;
                 const list = [];
-                const promises = [];
 
                 for (const entry of entries) {
-                    promises.push(new Promise((resolve, reject) => {
-                        fetch(getSingleSaveUrl(entry.SaveFile)).then(saveFileJSON => {
-                            if (!saveFileJSON.ok) {
-                                resolve();
+                    const parts = entry.Value.split(' === ');
 
-                                return;
-                            }
-
-                            saveFileJSON.json().then(saveFile => {
-                                list.push({
-                                    frequency: (parseInt(entry.Value) / 1000).toFixed(2),
-                                    name: saveFile.MachineInformation.Cpu.Name,
-                                    vendor: saveFile.MachineInformation.Cpu.Vendor,
-                                    filename: '?detail=' + entry.SaveFile
-                                });
-
-                                resolve();
-                            });
-                        })
-                    }));
+                    list.push({
+                        frequency: (parseInt(parts[2]) / 1000).toFixed(2),
+                        name: parts[0],
+                        vendor: parts[1],
+                        filename: '?detail=' + entry.SaveFile
+                    });
                 }
 
-                Promise.all(promises).then(() => {
-                    list.sort(function (a, b) {
-                        if (a.frequency > b.frequency) {
-                            return -1;
-                        }
+                list.sort(function (a, b) {
+                    if (a.frequency > b.frequency) {
+                        return -1;
+                    }
 
-                        if (a.frequency < b.frequency) {
-                            return 1;
-                        }
+                    if (a.frequency < b.frequency) {
+                        return 1;
+                    }
 
-                        return 0;
-                    });
-
-                    resolve(list);
+                    return 0;
                 });
+
+                resolve(list);
             });
         });
     });
 }
 
-function getHighestScores() {
+function getHighestScores(): Promise<Array<{ score: number, name: string, vendor: string, filename: string }>> {
     return new Promise((resolve, reject) => {
-        fetch(getHighestOverallScoreAggregationUrl()).then(highestScoresJSON => {
+        fetch(getHighestOverallScoreAggregationUrl()).then((highestScoresJSON: Response) => {
             if (!highestScoresJSON.ok) {
                 resolve([]);
 
@@ -74,7 +58,7 @@ function getHighestScores() {
             }
 
             highestScoresJSON.json().then(highestScores => {
-                const entries = highestScores.Entries.length > 5 ? highestScores.Entries.slice(0, 5) : highestScores.Entries;
+                const entries: Array<{ Value: string, SaveFile: string }> = highestScores.Entries.length > 5 ? highestScores.Entries.slice(0, 5) : highestScores.Entries;
                 const list = [];
 
                 for (const entry of entries) {
@@ -106,10 +90,10 @@ function getHighestScores() {
     });
 }
 
-function renderCpuList(cpus) {
+function renderCpuList(cpus: Array<{ Value: string, SaveFile: string }>): Array<{ name: string, vendor: string, score: string, filename: string }> {
     const cpuList = [];
 
-    cpus.forEach(function (item) {
+    cpus.forEach(function (item: { Value: string, SaveFile: string }) {
         const item_parts = item.Value.split(" === ");
 
         cpuList.push({
@@ -123,7 +107,7 @@ function renderCpuList(cpus) {
     return cpuList;
 }
 
-function getResultsCurrentPage(page = current_page - 1) {
+function getResultsCurrentPage(page: number = current_page - 1): Promise<Array<{ Value: string, SaveFile: string }>> {
     return new Promise((resolve, reject) => {
         if (results.length > page * 10) {
             resolve(results.slice(page * 10, page * 10 + 10));

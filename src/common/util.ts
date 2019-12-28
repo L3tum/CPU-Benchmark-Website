@@ -1,4 +1,6 @@
-export function calculateOverallScore(save): number {
+import {Save} from '@l3tum/cpu-benchmark-common'
+
+export function calculateOverallScore(save: Save): number {
     const keys = Object.keys(save.Results);
     let total_ac = 0;
     let number_ac = 0;

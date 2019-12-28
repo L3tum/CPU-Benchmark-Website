@@ -46,7 +46,7 @@ export function renderComparisonGraph(context: HTMLCanvasElement, self_score: nu
     });
 }
 
-export function renderComparison(comparisons: Array<Record<string, any>>, context: HTMLCanvasElement, highest: number = 0, lowest: number = 0, label: string = 'Points') {
+export function renderComparison(comparisons: Array<Record<string, any>>, context: HTMLCanvasElement, highest: number = 0, lowest: number = 0, label: string = 'Points'): void {
     comparisons.sort(function (a, b) {
         if (a.value > b.value) {
             return -1;

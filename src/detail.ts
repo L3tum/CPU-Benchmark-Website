@@ -8,8 +8,9 @@ import {
 import {wiki_links} from "./common/wiki_links_feature_flags";
 import {vendor_colors} from "./common/vendor_colors";
 import {renderComparison, renderComparisonGraph} from "./common/comparison";
-import detailTemplate from "./templates/detail_template.msc";
+import detailTemplate from './templates/detail_template.msc'
 import {calculateOverallScore} from "./common/util";
+import {Save} from "@l3tum/cpu-benchmark-common";
 
 let renderPromise = new Promise((resolve) => resolve());
 let average = null;
@@ -19,7 +20,7 @@ function error() {
     $('#accordion').html("<h5>Can't find the specified save!</h5>")
 }
 
-function fetchAveragePointsAroundScore(nameToSkip, limit = 10000) {
+function fetchAveragePointsAroundScore(nameToSkip: string, limit: number = 10000): Promise<Array<Record<string, any>>> {
     return new Promise((resolve, reject) => {
         fetch(getAverageAggregationUrl()).then(averagesJSON => {
             if (!averagesJSON.ok) {
@@ -67,7 +68,7 @@ function fetchAveragePointsAroundScore(nameToSkip, limit = 10000) {
     });
 }
 
-function renderPointsComparisonGraph(save) {
+function renderPointsComparisonGraph(save: Save): Promise<void> {
     return new Promise((resolve, reject) => {
         fetch(getSingleSaveUrl(`average_${save.MachineInformation.Cpu.Caption.replace('@', 'at').replace(/ /g, '_').replace(/,/g, '_')}.automated`)).then(json => {
             let averagePromise = new Promise((resolve1) => resolve1());
@@ -101,7 +102,7 @@ function renderPointsComparisonGraph(save) {
                         const lowest = Math.round(comparisons[comparisons.length - 1].value - 10000 > 0 ? (comparisons[comparisons.length - 1].value - 10000) / 10000 : 0) * 10000;
                         const highest = Math.round(comparisons[0].value + 10000 < 100000 ? (comparisons[0].value + 10000) / 10000 : 10000) * 10000;
 
-                        renderComparison(comparisons, document.getElementById('score_comparison'), highest, lowest)
+                        renderComparison(comparisons, document.getElementById('score_comparison') as HTMLCanvasElement, highest, lowest)
                     }
 
                     resolve();
@@ -111,7 +112,7 @@ function renderPointsComparisonGraph(save) {
     });
 }
 
-function renderSCComparisonGraph(save) {
+function renderSCComparisonGraph(save: Save): Promise<void> {
     return new Promise((resolve, reject) => {
         if (!(1 in save.Results)) {
             document.getElementById('sc_average').classList.add('d-none');
@@ -120,7 +121,7 @@ function renderSCComparisonGraph(save) {
         }
 
         renderPromise.then(() => {
-            renderComparisonGraph(document.getElementById('sc_comparison'), save.Results[1].find(bench => bench.Benchmark === "Category: all").Points, save.MachineInformation.Cpu.Name, getSCAverageAggregationUrl()).then((success) => {
+            renderComparisonGraph(document.getElementById('sc_comparison') as HTMLCanvasElement, save.Results[1].find(bench => bench.Benchmark === "Category: all").Points, save.MachineInformation.Cpu.Name, getSCAverageAggregationUrl()).then((success) => {
                 if (!success) {
                     document.getElementById('sc_average').classList.add('d-none');
                 }
@@ -131,7 +132,7 @@ function renderSCComparisonGraph(save) {
     });
 }
 
-function renderACComparisonGraph(save) {
+function renderACComparisonGraph(save: Save): Promise<void> {
     return new Promise((resolve, reject) => {
         if (!(save.MachineInformation.Cpu.LogicalCores in save.Results)) {
             document.getElementById('ac_average').classList.add('d-none');
@@ -140,7 +141,7 @@ function renderACComparisonGraph(save) {
         }
 
         renderPromise.then(() => {
-            renderComparisonGraph(document.getElementById('ac_comparison'), save.Results[save.MachineInformation.Cpu.LogicalCores].find(bench => bench.Benchmark === "Category: all").Points, save.MachineInformation.Cpu.Name, getACAverageAggregationUrl(save.MachineInformation.Cpu.LogicalCores)).then((success) => {
+            renderComparisonGraph(document.getElementById('ac_comparison') as HTMLCanvasElement, save.Results[save.MachineInformation.Cpu.LogicalCores].find(bench => bench.Benchmark === "Category: all").Points, save.MachineInformation.Cpu.Name, getACAverageAggregationUrl(save.MachineInformation.Cpu.LogicalCores)).then((success) => {
                 if (!success) {
                     document.getElementById('ac_average').classList.add('d-none');
                 }
@@ -151,7 +152,7 @@ function renderACComparisonGraph(save) {
     });
 }
 
-export function renderResults(save) {
+export function renderResults(save: Save): Record<string, Array<{ name: string; value: string; } | { name: string; value: number; }>> {
     const results_all = [];
     const results_categories = [];
     const results_detailed = [];
@@ -185,7 +186,7 @@ export function renderResults(save) {
     return {'all': results_all, 'categories': results_categories, 'detailed': results_detailed};
 }
 
-function renderFeatureFlags(save) {
+function renderFeatureFlags(save: Save): Array<{ name: string; value: string; } | { name: string; value: number; }> {
     let feature_flags = [
         {
             name: 'Feature Flags',
@@ -224,7 +225,7 @@ function renderFeatureFlags(save) {
     return feature_flags;
 }
 
-export function renderInfo(save) {
+export function renderInfo(save: Save): Array<{ name: string; value: string; } | { name: string; value: number; }> {
     let info = [
         {
             name: 'Caption',
@@ -307,7 +308,7 @@ export function render() {
     $('#sorting').hide();
     $('#prev').parent().hide();
 
-    const id = window.location.search.replace("?detail=", "");
+    const id: string = window.location.search.replace("?detail=", "");
 
     renderPromise = new Promise((resolve, reject) => {
         fetch(getSingleSaveUrl(id)).then(result => {
@@ -326,7 +327,7 @@ export function render() {
                 const results = renderResults(save);
                 const info = renderInfo(save);
 
-                const html = detailTemplate({
+                const html: string = detailTemplate({
                     save: id,
                     name: save.MachineInformation.Cpu.Name,
                     score: isNaN(score) ? '0'.padStart(5, '0') : score.toString().padStart(5, '0'),

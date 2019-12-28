@@ -1,4 +1,4 @@
-export const wiki_links = {
+export const wiki_links: Record<string, string> = {
     'AVX2': '//wikipedia.org/wiki/AVX2',
     'TSC': '//wikipedia.org/wiki/Time_Stamp_Counter',
     'TSC_INVARIANT': '//wikipedia.org/wiki/Time_Stamp_Counter',
