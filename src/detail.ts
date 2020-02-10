@@ -99,8 +99,8 @@ function renderPointsComparisonGraph(save: Save): Promise<void> {
                     }
 
                     if (comparisons.length > 1) {
-                        const lowest = Math.round(comparisons[comparisons.length - 1].value - 10000 > 0 ? (comparisons[comparisons.length - 1].value - 10000) / 10000 : 0) * 10000;
-                        const highest = Math.round(comparisons[0].value + 10000 < 100000 ? (comparisons[0].value + 10000) / 10000 : 10000) * 10000;
+                        const lowest = Math.round(comparisons[comparisons.length - 1].value - 1000 > 0 ? (comparisons[comparisons.length - 1].value - 1000) / 1000 : 0) * 1000;
+                        const highest = Math.round(comparisons[0].value + 1000 < 10000 ? (comparisons[0].value + 1000) / 1000 : 1000) * 1000;
 
                         renderComparison(comparisons, document.getElementById('score_comparison') as HTMLCanvasElement, highest, lowest)
                     }
