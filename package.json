@@ -40,7 +40,7 @@
     "@l3tum/cpu-benchmark-common": "^1.0.3",
     "@octokit/rest": "^16.36.0",
     "bootstrap": "^4.4.1",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "popper.js": "^1.16.0"
